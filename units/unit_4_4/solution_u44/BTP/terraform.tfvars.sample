@@ -1,0 +1,2 @@
+globalaccount               = "<YOUR GLOBALACCOUNT_SUBDOMAIN>"
+subaccount_emergency_admins = ["jane.doe@test.com", "john.doe@test.com"]
