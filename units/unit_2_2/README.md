@@ -69,7 +69,8 @@ Let us apply this first configuration. The application of configurations follows
    ```
    We see the following result:
 
-   TODO Picture
+   TODO picture
+
 
 1. Next we should make sure that the formatting of the code is aligned with the canonical formatting defined for the Hashicorp Configuration language. We execute the following command:
 
@@ -78,7 +79,7 @@ Let us apply this first configuration. The application of configurations follows
    ```
    We see the following result - looks good:
 
-   TODO Picture
+   TODO picture
 
 1. After that it makes sense to do a static validation of our code where we do not yet need a connection to SAP BTP. We execute the following command:
 
@@ -87,7 +88,7 @@ Let us apply this first configuration. The application of configurations follows
    ```
    We see the following result - nothing to worry about:
 
-   TODO Picture
+   TODO picture
 
 1. Now let us get serious. We execute a planning to check what Terraform intends to do based on our configuration. Execute the following command:
 
@@ -96,7 +97,7 @@ Let us apply this first configuration. The application of configurations follows
    ```
    We see the following result:
 
-   TODO Picture
+   TODO picture
 
    This looks like what we want to achieve right? We stored this plan using the `-out` parameter.
 

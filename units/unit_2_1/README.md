@@ -8,7 +8,7 @@ The goal of this unit is to have a basic configuration of a Terraform provider i
 
 ### The Terraform provider configuration
 
-As we are starting from scratch create a new directory in the root directory of this repository called `learning-terraform-on-sapbtp`.
+As we are starting from scratch, create a new directory in the root directory of this repository called `learning-terraform-on-sapbtp`.
 Navigate into the newly created directory and create an empty file called `provider.tf`. This file will contain the configuration of the Terraform provider for SAP BTP.
 
 Open the file and add the following code:
@@ -31,7 +31,7 @@ This code block tells Terraform what providers are required for the application 
 
 In addition to telling Terraform which provider to use, the provider usually also needs a provider-specific configuration. This configuration mainly comprises the authentication information needed for Terraform to communicate with the platform. You find the required information in the documentation of the specific provider. In case of the Terraform provider for SAP BTP you find it in the [main section of the documentation](https://registry.terraform.io/providers/SAP/btp/latest/docs).
 
-We see that the only required parameter is the *subdomain* of the global account we are using. Therefore we add the following code to the `provider.tf` file:
+We see that the only required parameter is the *subdomain* of the global account we are using. Therefore we add the following code at the end of the `provider.tf` file:
 
 ```terraform
 provider "btp" {
