@@ -1,7 +1,11 @@
 APIs
 autocompletion
+Backend
+backend
 BTP
 btp
+checksum
+checksums
 CLA
 CLI
 CodeQL
