@@ -5,6 +5,7 @@ locals {
   subaccount_subdomain = join("-", [lower(replace("${var.subaccount_stage}-${var.project_name}", " ", "-")), random_uuid.uuid.result])
   beta_enabled         = var.subaccount_stage == "PROD" ? false : true
   service_name_prefix  = lower(replace("${var.subaccount_stage}-${var.project_name}", " ", "-"))
+  subaccount_cf_org    = local.subaccount_subdomain
 }
 
 resource "btp_subaccount" "project_subaccount" {
@@ -54,4 +55,24 @@ resource "btp_subaccount_subscription" "feature_flags_dashboard_app_lite" {
   app_name      = "feature-flags-dashboard"
   plan_name     = "dashboard"
   depends_on    = [btp_subaccount_entitlement.feature_flags_dashboard_app_lite]
+}
+
+data "btp_subaccount_environments" "all" {
+  subaccount_id = btp_subaccount.project_subaccount.id
+}
+
+resource "terraform_data" "cf_landscape_label" {
+  input = length(var.cf_landscape_label) > 0 ? var.cf_landscape_label : [for env in data.btp_subaccount_environments.all.values : env if env.service_name == "cloudfoundry" && env.environment_type == "cloudfoundry"][0].landscape_label
+}
+
+resource "btp_subaccount_environment_instance" "cloudfoundry" {
+  subaccount_id    = btp_subaccount.project_subaccount.id
+  name             = local.subaccount_cf_org
+  environment_type = "cloudfoundry"
+  service_name     = "cloudfoundry"
+  plan_name        = "trial"
+  landscape_label  = terraform_data.cf_landscape_label.output
+  parameters = jsonencode({
+    instance_name = local.subaccount_cf_org
+  })
 }

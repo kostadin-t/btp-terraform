@@ -38,3 +38,9 @@ variable "project_costcenter" {
     error_message = "Cost center must be a 5 digit number"
   }
 }
+
+variable "cf_landscape_label" {
+  type        = string
+  description = "The Cloud Foundry landscape (format example us10-001)."
+  default     = ""
+}
