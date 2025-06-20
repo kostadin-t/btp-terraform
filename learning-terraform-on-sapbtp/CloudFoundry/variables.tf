@@ -35,3 +35,8 @@ variable "cf_space_developer" {
   type        = string
   sensitive   = true
 }
+
+variable "subaccount_url" {
+  description = "The SAP BTP subaccount URL"
+  type        = string
+}
