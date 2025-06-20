@@ -3,16 +3,10 @@ variable "globalaccount" {
   type        = string
 }
 
-variable "subaccount_name" {
-  description = "Name of the subaccount"
+variable "project_name" {
+  description = "Name of the project"
   type        = string
-  default     = "DEV Project Terraform"
-}
-
-variable "subaccount_subdomain" {
-  description = "Subdomain of the subaccount"
-  type        = string
-  default     = "dev-project-terraform"
+  default     = "Project ABC"
 }
 
 variable "subaccount_region" {
@@ -23,12 +17,6 @@ variable "subaccount_region" {
     condition     = contains(["us10", "ap21"], var.subaccount_region)
     error_message = "Region must be one of us10 or ap21"
   }
-}
-
-variable "subaccount_beta_enabled" {
-  description = "Beta feaatures enabled on subaccount"
-  type        = bool
-  default     = true
 }
 
 variable "subaccount_stage" {
