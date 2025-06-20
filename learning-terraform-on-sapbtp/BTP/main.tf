@@ -45,3 +45,10 @@ resource "btp_subaccount_environment_instance" "cloudfoundry" {
     instance_name = local.subaccount_cf_org
   })
 }
+
+resource "btp_subaccount_role_collection_assignment" "emergency_adminitrators" {
+  for_each             = toset(var.subaccount_emergency_admins)
+  subaccount_id        = btp_subaccount.project_subaccount.id
+  role_collection_name = "Subaccount Administrator"
+  user_name            = each.value
+}

@@ -44,3 +44,9 @@ variable "cf_landscape_label" {
   description = "The Cloud Foundry landscape (format example us10-001)."
   default     = ""
 }
+
+variable "subaccount_emergency_admins" {
+  type        = list(string)
+  description = "List of emergency admins for the SAP BTP subaccount"
+  default     = []
+}
