@@ -2,12 +2,17 @@ resource "random_uuid" "uuid" {}
 data "btp_globalaccount" "this" {}
 
 locals {
-  subaccount_name      = "${var.subaccount_stage} ${var.project_name}"
-  subaccount_subdomain = join("-", [lower(replace("${var.subaccount_stage}-${var.project_name}", " ", "-")), random_uuid.uuid.result])
-  beta_enabled         = var.subaccount_stage == "PROD" ? false : true
-  subaccount_cf_org    = local.subaccount_subdomain
-  service_name__connectivity    = "connectivity"
-  service_name__destination     = "destination"
+  subaccount_name                 = "${var.subaccount_stage} ${var.project_name}"
+  subaccount_subdomain            = join("-", [lower(replace("${var.subaccount_stage}-${var.project_name}", " ", "-")), random_uuid.uuid.result])
+  beta_enabled                    = var.subaccount_stage == "PROD" ? false : true
+  subaccount_cf_org               = local.subaccount_subdomain
+  service_name__connectivity      = "connectivity"
+  service_name__destination       = "destination"
+  connectivity_destination_admins = var.connectivity_destination_admins
+  cloud_connector_admins          = var.cloud_connector_admins
+  custom_idp_tenant = var.custom_idp != "" ? element(split(".", var.custom_idp), 0) : ""
+  origin_key        = local.custom_idp_tenant != "" ? "${local.custom_idp_tenant}-platform" : ""
+
 }
 
 resource "btp_subaccount" "project_subaccount" {
@@ -19,6 +24,16 @@ resource "btp_subaccount" "project_subaccount" {
     "stage"      = [var.subaccount_stage]
     "costcenter" = [var.project_costcenter]
   }
+}
+
+# ------------------------------------------------------------------------------------------------------
+# Assign custom IDP to sub account (if custom_idp is set)
+# ------------------------------------------------------------------------------------------------------
+resource "btp_subaccount_trust_configuration" "fully_customized" {
+  # Only create trust configuration if custom_idp has been set 
+  count             = var.custom_idp == "" ? 0 : 1
+  subaccount_id     = btp_subaccount.project_subaccount.id
+  identity_provider = var.custom_idp
 }
 
 module "srvc_baseline" {
@@ -115,4 +130,20 @@ module "integration_suite" {
   cpi_admins                     = var.cpi_admins
   cpi_developers                 = var.cpi_developers
   integration_provisioners       = var.integration_provisioners
+}
+
+resource "btp_subaccount_role_collection_assignment" "connectivity_destination_admins" {
+  for_each             = toset(local.connectivity_destination_admins)
+  subaccount_id        = btp_subaccount.project_subaccount.id
+  role_collection_name = "Connectivity and Destination Administrator"
+  user_name            = each.value
+  depends_on           = [btp_subaccount_entitlement.destination]
+}
+
+resource "btp_subaccount_role_collection_assignment" "cloud_connector_admins" {
+  for_each             = toset(local.cloud_connector_admins)
+  subaccount_id        = btp_subaccount.project_subaccount.id
+  role_collection_name = "Cloud Connector Administrator"
+  user_name            = each.value
+  depends_on           = [btp_subaccount_entitlement.connectivity]
 }

@@ -153,3 +153,30 @@ variable "cloud_connector_admins" {
   type        = list(string)
   description = "Defines the colleagues who are administrators for Cloud Connector"
 }
+
+variable "custom_idp" {
+  type        = string
+  description = "The custom identity provider for the subaccount."
+  default     = ""
+}
+
+variable "custom_idp_apps_origin_key" {
+  type        = string
+  description = "The custom identity provider for the subaccount."
+  default     = "sap.custom"
+}
+
+variable "origin" {
+  type        = string
+  description = "Defines the origin key of the identity provider"
+  default     = "sap.ids"
+  # The value for the origin_key can be defined
+  # but are normally set to "sap.ids", "sap.default" or "sap.custom"
+}
+
+variable "origin_key" {
+  type        = string
+  description = "Defines the origin key of the identity provider"
+  default     = ""
+  # The value for the origin_key can be defined, set to "sap.ids", "sap.default" or "sap.custom"
+}
