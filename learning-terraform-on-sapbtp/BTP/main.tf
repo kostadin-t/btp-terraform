@@ -6,6 +6,8 @@ locals {
   subaccount_subdomain = join("-", [lower(replace("${var.subaccount_stage}-${var.project_name}", " ", "-")), random_uuid.uuid.result])
   beta_enabled         = var.subaccount_stage == "PROD" ? false : true
   subaccount_cf_org    = local.subaccount_subdomain
+  service_name__connectivity    = "connectivity"
+  service_name__destination     = "destination"
 }
 
 resource "btp_subaccount" "project_subaccount" {
@@ -51,4 +53,66 @@ resource "btp_subaccount_role_collection_assignment" "emergency_adminitrators" {
   subaccount_id        = btp_subaccount.project_subaccount.id
   role_collection_name = "Subaccount Administrator"
   user_name            = each.value
+}
+
+# ------------------------------------------------------------------------------------------------------
+# Setup SAP Build Code
+# ------------------------------------------------------------------------------------------------------
+module "build_code" {
+  source = "./modules/build_code/"
+
+  subaccount_id = btp_subaccount.project_subaccount.id
+
+  application_studio_admins             = var.application_studio_admins
+  application_studio_developers         = var.application_studio_developers
+  application_studio_extension_deployer = var.application_studio_extension_deployer
+
+  build_code_admins     = var.build_code_admins
+  build_code_developers = var.build_code_developers
+}
+
+# ------------------------------------------------------------------------------------------------------
+# Setup SAP Build Process Automation
+# ------------------------------------------------------------------------------------------------------
+module "build_process_automation" {
+  source = "./modules/build_process_automation"
+
+  subaccount_id = btp_subaccount.project_subaccount.id
+
+  process_automation_admins       = var.process_automation_admins
+  process_automation_developers   = var.process_automation_developers
+  process_automation_participants = var.process_automation_participants
+}
+
+# ------------------------------------------------------------------------------------------------------
+# Setup connectivity (Connectivity Service)
+# ------------------------------------------------------------------------------------------------------
+# Entitle
+resource "btp_subaccount_entitlement" "connectivity" {
+  subaccount_id = btp_subaccount.project_subaccount.id
+  service_name  = local.service_name__connectivity
+  plan_name     = var.service_plan__connectivity
+}
+
+# ------------------------------------------------------------------------------------------------------
+# Setup destination (Destination Service)
+# ------------------------------------------------------------------------------------------------------
+# Entitle
+resource "btp_subaccount_entitlement" "destination" {
+  subaccount_id = btp_subaccount.project_subaccount.id
+  service_name  = local.service_name__destination
+  plan_name     = var.service_plan__destination
+}
+
+# ------------------------------------------------------------------------------------------------------
+# Setup SAP Integration Suite
+# ------------------------------------------------------------------------------------------------------
+module "integration_suite" {
+  source                         = "./modules/integration_suite"
+  subaccount_id                  = btp_subaccount.project_subaccount.id
+  service_plan__integrationsuite = var.service_plan__integrationsuite
+  cloud_connector_admins         = var.cloud_connector_admins
+  cpi_admins                     = var.cpi_admins
+  cpi_developers                 = var.cpi_developers
+  integration_provisioners       = var.integration_provisioners
 }
